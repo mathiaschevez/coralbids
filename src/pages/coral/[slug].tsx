@@ -69,7 +69,7 @@ const ProductDetail: React.FC<{product: ProductType}> = ({ product }) => {
           <div>
             <h1 className='mt-6'>Bidders</h1>
             <div className='flex flex-col gap-1 mt-3'>
-              {mockBidders.map((bidder) => (
+              {mockBidders?.map((bidder) => (
                 <Link key={bidder?.name} href='/'>
                   <button className='flex gap-3 border w-full items-center p-1 rounded'>
                     <div className='flex items-center justify-center z-10'>
@@ -95,7 +95,7 @@ export const getStaticPaths = async () => {
   }` 
 
   const products = await client.fetch(query)
-  const paths = products.map((product: ProductType) => ({
+  const paths = products?.map((product: ProductType) => ({
     params: {
       slug: product?.slug.current
     }
