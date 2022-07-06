@@ -44,7 +44,7 @@ const mockBidders = [
 ]
 
 const ProductDetail: React.FC<{product: ProductType}> = ({ product }) => {
-  const src = urlFor(product.image && product?.image[0]).url()
+  const src = urlFor(product?.image && product?.image[0]).url()
   
   if (!product) return <h1>This product doesn't exist...</h1>
 
