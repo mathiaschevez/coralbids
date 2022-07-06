@@ -46,7 +46,7 @@ const mockBidders = [
 const ProductDetail: React.FC<{product: ProductType}> = ({ product }) => {
   const src = urlFor(product?.image && product?.image[0]).url()
   
-  if (!product) return <h1>This product doesn't exist...</h1>
+  if (!product) return <h1>This product does not exist...</h1>
 
   return (
     <div className='flex gap-3 max-h-[400px]'>
