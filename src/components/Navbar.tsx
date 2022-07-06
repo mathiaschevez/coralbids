@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSession, signIn, signOut } from "next-auth/react"
 import Link from 'next/link'
 import Image from 'next/image'
@@ -7,6 +7,7 @@ import { AiOutlineUser } from 'react-icons/ai'
 const Navbar = () => {
   const { data: session, status } = useSession()
 
+  console.log(session)
 
   return (
     <div className='fixed w-screen flex justify-between py-2 px-16 bg-[#3DB3BB] text-white items-center z-50'>

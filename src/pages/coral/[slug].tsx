@@ -1,12 +1,45 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 import { client, urlFor } from '../../db/client'
 import { ProductType } from '../../utils/types'
 
 const mockBidders = [
   {
-    image: 'https://images.unsplash.com/photo-1598790981323-b9d9d9d9d9d9?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+    image: 'https://picsum.photos/200',
     name: 'Bidder 1',
+  },
+  {
+    image: 'https://picsum.photos/200',
+    name: 'Bidder 2',
+  },
+  {
+    image: 'https://picsum.photos/200',
+    name: 'Bidder 3',
+  },
+  {
+    image: 'https://picsum.photos/200',
+    name: 'Bidder 4',
+  },
+  {
+    image: 'https://picsum.photos/200',
+    name: 'Bidder 5',
+  },
+  {
+    image: 'https://picsum.photos/200',
+    name: 'Bidder 5',
+  },
+  {
+    image: 'https://picsum.photos/200',
+    name: 'Bidder 5',
+  },
+  {
+    image: 'https://picsum.photos/200',
+    name: 'Bidder 5',
+  },
+  {
+    image: 'https://picsum.photos/200',
+    name: 'Bidder 5',
   },
 ]
 
@@ -16,7 +49,7 @@ const ProductDetail: React.FC<{product: ProductType}> = ({ product }) => {
   if (!product) return <h1>This product doesn't exist...</h1>
 
   return (
-    <div className='flex gap-3'>
+    <div className='flex gap-3 max-h-[400px]'>
       <Image 
         loader={() => src}
         src={src} 
@@ -29,18 +62,22 @@ const ProductDetail: React.FC<{product: ProductType}> = ({ product }) => {
           <h1 className='text-3xl font-semibold'>{product?.name}</h1>
           <h1>{product.details}</h1>
         </div>
-        <div className='border p-6 flex flex-col'>
+        <div className='border px-6 pb-6 flex flex-col overflow-scroll'>
           <div>
-            <h1 className='text-xl'>The current bid is at: ${product.price}</h1>
+            <h1 className='fixed text-xl bg-white z-30 py-3 w-full'>The current bid is at: ${product.price}</h1>
           </div>
           <div>
-            <h1>Bidders</h1>
-            <div>
+            <h1 className='mt-6'>Bidders</h1>
+            <div className='flex flex-col gap-1 mt-3'>
               {mockBidders.map((bidder) => (
-                <div className='flex gap-3'>
-                  <img src={bidder.image} alt={bidder.name} />
-                  <h1>{bidder.name}</h1>
-                </div>
+                <Link key={bidder.name} href='/'>
+                  <button className='flex gap-3 border w-full items-center p-1 rounded'>
+                    <div className='flex items-center justify-center z-10'>
+                      <Image loader={() => bidder.image} src={bidder.image} alt={bidder.name} height={30} width={30}/>
+                    </div>
+                    <h1>{bidder.name}</h1>
+                  </button>
+                </Link>
               ))}
             </div>
           </div>

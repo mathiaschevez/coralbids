@@ -44,8 +44,16 @@ export default {
     {
       name: 'bids',
       title: 'Bids',
-      type: 'reference',
-      to: [{type: 'user'}]
+      type: 'array',
+      of: [
+        { type: 'object',
+          fields: [
+            {name: 'name', type: 'string', title: 'Name'},
+            {name: 'email', type: 'string', title: 'Email'},
+            {name: 'image', type: 'string', title: 'Image'}
+          ]
+        }
+      ],
     }
   ] 
 }
