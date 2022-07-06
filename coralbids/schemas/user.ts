@@ -1,13 +1,12 @@
 export default {
-  name: 'product',
-  title: 'Product',
+  name: 'user',
+  title: 'User',
   type: 'document',
   fields: [
     {
       name: 'image',
       title: 'Image',
-      type: 'array',
-      of: [{ type: 'image' }],
+      type: 'image',
       options: {
         hotspot: true,
       }
@@ -32,20 +31,9 @@ export default {
       }
     },
     {
-      name: 'price',
-      title: 'Price',
-      type: 'number',
-    },
-    {
-      name: 'details',
-      title: 'Details',
+      name: 'email',
+      title: 'Email',
       type: 'string',
     },
-    {
-      name: 'bids',
-      title: 'Bids',
-      type: 'reference',
-      to: [{type: 'user'}]
-    }
   ] 
 }
