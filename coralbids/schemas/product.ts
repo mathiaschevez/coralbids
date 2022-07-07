@@ -48,12 +48,24 @@ export default {
       of: [
         { type: 'object',
           fields: [
+            {name: 'id', type: 'string', title: 'ID'},
             {name: 'name', type: 'string', title: 'Name'},
             {name: 'email', type: 'string', title: 'Email'},
             {name: 'image', type: 'string', title: 'Image'}
           ]
         }
       ],
+    },
+    {
+      name: 'winningBid',
+      title: 'Winning Bid',
+      type: 'object',
+      fields: [
+        {name: 'id', type: 'string', title: 'ID'},
+        {name: 'name', type: 'string', title: 'Name'},
+        {name: 'email', type: 'string', title: 'Email'},
+        {name: 'image', type: 'string', title: 'Image'}
+      ]
     }
   ] 
 }
