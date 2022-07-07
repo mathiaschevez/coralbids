@@ -1,13 +1,18 @@
 import React from 'react'
 import Navbar from './Navbar'
+import Footer from './Footer'
+import { useStateContext } from '../context/StateContext'
 
 const Layout = ({ children }: {children: JSX.Element}) => {
+  const { darkModeActive } = useStateContext()
+
   return (
-    <div>
+    <div className={`${darkModeActive ? 'bg-coralblack' : 'bg-white'} h-[100%]`}>
       <Navbar />
-      <div className='pt-20 px-16'>
+      <div className='pt-28 px-16'>
         {children}
       </div>
+      <Footer />
     </div>
   )
 }

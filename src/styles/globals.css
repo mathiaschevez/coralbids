@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background-color: #101419;
+}
+
+/* blue: #3DB3BB */
+
+/* green: #79BF8B */
+
+/* green yellow: #C6DE8B */
+
+/* yello: #FEF48F */
+
+/* #0C2325 */
+
+/* black: #101419 */

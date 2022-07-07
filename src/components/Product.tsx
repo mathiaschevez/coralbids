@@ -17,6 +17,7 @@ const Product = ({ product }: { product: ProductType }) => {
           alt={product.name} 
           height={200}
           width={200}
+          className='rounded'
         />
         <h1>{product.name}</h1>
       </div>
