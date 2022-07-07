@@ -10,7 +10,7 @@ const Product = ({ product }: { product: ProductType }) => {
 
   return (
     <Link href={`/coral/${product.slug.current}`}>
-      <div className='cursor-pointer'>
+      <div className='cursor-pointer text-white'>
         <Image 
           loader={() => src}
           src={src} 
