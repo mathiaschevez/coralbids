@@ -7,4 +7,12 @@ export type ProductType = {
   slug: {
     current: string
   }
+  bids: [
+    {
+      id: string,
+      name: string,
+      email: string,
+      image: string,
+    }
+  ]
 }

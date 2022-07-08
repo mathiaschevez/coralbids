@@ -15,6 +15,14 @@ export type ProductsType = [
     slug: {
       current: string
     }
+    bids: [
+      {
+        id: string,
+        name: string,
+        email: string,
+        image: string,
+      }
+    ]
   }
 ]
 
@@ -28,7 +36,7 @@ const Home: React.FC<{products: ProductsType}> = ({products}) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div>
-        <div>
+        <div className='grid grid-cols-4 items-center'>
           {products.map((product) => (
             <Product key={product.key} product={product} />
           ))}

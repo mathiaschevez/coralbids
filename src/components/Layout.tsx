@@ -7,7 +7,7 @@ const Layout = ({ children }: {children: JSX.Element}) => {
   const { darkModeActive } = useStateContext()
 
   return (
-    <div className={`${darkModeActive ? 'bg-coralblack' : 'bg-white'} h-[100%]`}>
+    <div className={`${darkModeActive ? 'bg-coralblack' : 'bg-white'}`}>
       <Navbar />
       <div className='pt-28 px-16'>
         {children}

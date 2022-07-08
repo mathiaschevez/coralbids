@@ -1,16 +1,18 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
+import { useStateContext } from '../context/StateContext'
 import { urlFor } from '../db/client'
 import { ProductType } from '../utils/types'
 
 const Product = ({ product }: { product: ProductType }) => {
+  const { darkModeActive } = useStateContext()
   console.log(product)
   const src = urlFor(product.image && product?.image[0]).url()
 
   return (
     <Link href={`/coral/${product.slug.current}`}>
-      <div className='cursor-pointer text-white'>
+      <div className={`${darkModeActive ? 'text-white' : 'text-black'} flex flex-col m-auto cursor-pointer`}>
         <Image 
           loader={() => src}
           src={src} 
