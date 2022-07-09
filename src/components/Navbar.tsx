@@ -6,23 +6,21 @@ import { AiOutlineUser } from 'react-icons/ai'
 import { useStateContext } from '../context/StateContext'
 
 const ProfileModal = () => {
-  const { darkModeActive, setDarkModeActive } = useStateContext()
+  const { darkModeActive, setDarkModeActive, profileModalActive, setProfileModalActive } = useStateContext()
 
   return (
-    <div className='flex flex-col items-end mt-3'>
-      <div className={`${darkModeActive ? 'bg-coralblack' : 'bg-white text-black'} flex flex-col py-3 px-3 rounded border border-coralblue items-start`}>
+    <div onMouseLeave={() => setProfileModalActive(false)} className='flex flex-col items-end mt-3'>
+      <div onMouseLeave={() => setProfileModalActive(false)} className={`${darkModeActive ? 'bg-coralblack' : 'bg-white text-black'} flex flex-col py-3 px-3 rounded border border-coralblue items-start`}>
         <button className='hover:text-coralblue' onClick={() => setDarkModeActive(!darkModeActive)}>Toggle Theme</button>
         <button className='hover:text-red-600' onClick={() => signOut()}>Sign Out</button>
       </div>
     </div>
   )
-
 }
 
 const Navbar = () => {
   const { data: session, status } = useSession()
-  const { darkModeActive } = useStateContext()
-  const [profileModalActive, setProfileModalActive] = useState(false)
+  const { darkModeActive, profileModalActive, setProfileModalActive  } = useStateContext()
 
   useEffect(() => {
     if (!session) {
@@ -71,7 +69,7 @@ const Navbar = () => {
           </div>
         </div>
         {profileModalActive && 
-          <div className='w-full rounded-xl text-white z-50'>
+          <div className='w-full text-white z-50'>
             <ProfileModal />
           </div>
         }

@@ -57,6 +57,11 @@ export default {
       ],
     },
     {
+      title: 'Opening Date',
+      name: 'openingDate',
+      type: 'datetime'
+    },
+    {
       name: 'winningBid',
       title: 'Winning Bid',
       type: 'object',

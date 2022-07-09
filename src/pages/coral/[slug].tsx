@@ -1,7 +1,7 @@
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useStateContext } from '../../context/StateContext'
 import { client, urlFor } from '../../db/client'
 import { ProductType } from '../../utils/types'
@@ -18,33 +18,74 @@ type Bids = [
 const ProductDetail: React.FC<{product: ProductType, bids: Bids}> = ({ product, bids }) => {
   const { data: session, status } = useSession()
   const { darkModeActive } = useStateContext()
-  const [currentBids, setCurrentBids] = useState(bids)
   const src = urlFor(product?.image && product?.image[0]).url()
-  console.log(session)
+  const [currentBids, setCurrentBids] = useState(bids)
+
+
+  // TIMER LOGIC
+  const [countDate, setCountDate] = useState(new Date("2022-07-12 00:00:00").getTime())
+  const [now, setNow] = useState(new Date().getTime())
+  const seconds = 1000
+  const minutes = seconds * 60
+  const hours = minutes * 60
+  const days = hours * 24
+  
+  const [secondsLeft, setSecondsLeft] = useState(0)
+  const [minutesLeft, setMinutesLeft] = useState(0)
+  
+  // console.log(timeLeft)
+  const [timeLeft, setTimeLeft] = useState(0)
+  setTimeout(() => setTimeLeft(countDate - now), 1000)
 
   useEffect(() => {
-    
-  },[])
+    handleTimer()
+    if(secondsLeft % 10 === 0) {
+      getCurrentBids()
+    }
+  }, [timeLeft])
+
+  useEffect(() => {
+    setMinutesLeft(Math.floor(timeLeft % hours / minutes))
+
+  }, [secondsLeft])
+
+  const hoursLeft = useMemo(() => Math.floor(timeLeft % days / hours), [minutesLeft])
+  const daysLeft = useMemo(() => Math.floor(timeLeft / days), [hoursLeft])
+
+  const handleTimer = () => {
+    const secondsLeft = Math.floor((timeLeft % minutes) / seconds)
+    setSecondsLeft(secondsLeft)
+    setNow(new Date().getTime())
+  }
+
+  const getCurrentBids = async () => {
+    console.log(currentBids)
+  }
+
 
   const handleBid = () => {
-    
+
   }
+
 
   if (!product) return <h1>This product does not exist...</h1>
 
   return (
     <div className='text-white pb-[500px]'>
-      <div className={`${ darkModeActive ? 'text-white' : 'text-black'} flex gap-6 max-h-[400px]`}>
-        <Image 
-          loader={() => src}
-          src={src} 
-          alt={product?.name} 
-          height={400}
-          width={400}
-          className='rounded-lg'
-        />
+      <div className={`${ darkModeActive ? 'text-white' : 'text-black'} flex flex-col lg:flex-row gap-6`}>
+        <div className='m-auto'>
+          <Image 
+            loader={() => src}
+            src={src} 
+            alt={product?.name} 
+            height={400}
+            width={400}
+            objectFit='contain'
+            className='rounded-lg'
+          />
+        </div>
         <div className='flex flex-1 flex-col z-10 gap-6'>
-          <div className='flex flex-col w-1/3'>
+          <div className='flex flex-col w-full lg:w-1/3'>
             <h1 className='text-3xl font-semibold'>{product?.name}</h1>
             <h1>{product?.details}</h1>
           </div>
@@ -71,6 +112,9 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids}> = ({ product, 
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <h1>{daysLeft}: {hoursLeft}: {minutesLeft}: {secondsLeft}</h1>
       </div>
     </div>
   )
