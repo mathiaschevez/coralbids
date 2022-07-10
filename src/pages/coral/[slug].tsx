@@ -12,10 +12,11 @@ type Bids = [
     name: string,
     email: string,
     image: string,
+    openingDate: Date
   }
 ]
 
-const ProductDetail: React.FC<{product: ProductType, bids: Bids}> = ({ product, bids }) => {
+const ProductDetail: React.FC<{product: ProductType, bids: Bids, openingDate: Date}> = ({ product, bids, openingDate }) => {
   const { data: session, status } = useSession()
   const { darkModeActive } = useStateContext()
   const src = urlFor(product?.image && product?.image[0]).url()
@@ -23,7 +24,8 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids}> = ({ product, 
 
 
   // TIMER LOGIC
-  const [countDate, setCountDate] = useState(new Date("2022-07-12 00:00:00").getTime())
+  // console.log(openingDate)
+  const [countDate, setCountDate] = useState(new Date(openingDate).getTime())
   const [now, setNow] = useState(new Date().getTime())
   const seconds = 1000
   const minutes = seconds * 60
@@ -31,11 +33,18 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids}> = ({ product, 
   const days = hours * 24
   
   const [secondsLeft, setSecondsLeft] = useState(0)
-  const [minutesLeft, setMinutesLeft] = useState(0)
-  
-  // console.log(timeLeft)
+  // const [minutesLeft, setMinutesLeft] = useState(0)
+  // const [hoursLeft, setHoursLeft] = useState(0)
+  // const [daysLeft, setDaysLeft] = useState(0)
   const [timeLeft, setTimeLeft] = useState(0)
+
   setTimeout(() => setTimeLeft(countDate - now), 1000)
+  // console.log(timeLeft)
+
+  const handleTimer = () => {
+    setSecondsLeft(Math.floor((timeLeft % minutes) / seconds))
+    setNow(new Date().getTime())
+  }
 
   useEffect(() => {
     handleTimer()
@@ -44,20 +53,23 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids}> = ({ product, 
     }
   }, [timeLeft])
 
-  useEffect(() => {
-    setMinutesLeft(Math.floor(timeLeft % hours / minutes))
+  // useEffect(() => {
+  //   setMinutesLeft(Math.floor(timeLeft % hours / minutes))
+  // }, [secondsLeft])
 
-  }, [secondsLeft])
-
+  const minutesLeft = useMemo(() => Math.floor(timeLeft % hours / minutes), [secondsLeft])
   const hoursLeft = useMemo(() => Math.floor(timeLeft % days / hours), [minutesLeft])
-  const daysLeft = useMemo(() => Math.floor(timeLeft / days), [hoursLeft])
+  const daysLeft = useMemo(() => Math.floor(timeLeft % days / hours), [hoursLeft])
 
-  const handleTimer = () => {
-    const secondsLeft = Math.floor((timeLeft % minutes) / seconds)
-    setSecondsLeft(secondsLeft)
-    setNow(new Date().getTime())
-  }
+  // useEffect(() => {
+  //   setHoursLeft(Math.floor(timeLeft % days / hours))
+  // }, [minutesLeft])
 
+  // useEffect(() => {
+  //   setDaysLeft(Math.floor(timeLeft / days))
+  // }, [hoursLeft])
+
+  //move this inside the use effect and other dependencies aswell
   const getCurrentBids = async () => {
     console.log(currentBids)
   }
@@ -145,9 +157,10 @@ export const getStaticProps = async ({ params: { slug }}: {params: { slug: strin
   const query = `*[_type == "product" && slug.current == '${slug}'][0]`
   const product: ProductType = await client.fetch(query)
   const bids = product?.bids
+  const openingDate = product?.openingDate
 
   return {
-    props: { product, bids }
+    props: { product, bids, openingDate }
   }
 }
 

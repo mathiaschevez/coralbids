@@ -6,7 +6,7 @@ export type ProductType = {
   details: string,
   slug: {
     current: string
-  }
+  },
   bids: [
     {
       id: string,
@@ -14,5 +14,6 @@ export type ProductType = {
       email: string,
       image: string,
     }
-  ]
+  ],
+  openingDate: Date,
 }
