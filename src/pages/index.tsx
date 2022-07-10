@@ -22,7 +22,8 @@ export type ProductsType = [
         email: string,
         image: string,
       }
-    ]
+    ],
+    openingDate: Date
   }
 ]
 
