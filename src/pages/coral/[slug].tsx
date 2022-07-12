@@ -92,7 +92,7 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids, openingDate: Da
               <button onClick={() => handleBid()} className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Make a Bid</button>
             )}
           </div>
-          <div className='border rounded pb-6 flex flex-col overflow-scroll px-6'>
+          <div className='border rounded pb-6 flex flex-col overflow-y-scroll px-6 no-scroll-bar'>
             <h1 className='mt-3 text-lg'>Previous bids</h1>
             <div className='flex flex-col gap-1 mt-3'>
               {bids?.map((bidder, i) => (
