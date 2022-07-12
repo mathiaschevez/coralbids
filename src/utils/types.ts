@@ -8,15 +8,16 @@ export type ProductType = {
   slug: {
     current: string
   },
-  bids: [
-    {
-      id: string,
-      name: string,
-      email: string,
-      image: string,
-      dateTime: Date,
-    }
-  ],
   openingDate: Date,
+}
 
+export type BidType = {
+  name: string,
+  email: string,
+  image: string,
+  createdAt: Date,
+  product: {
+    _ref: string,
+    _type: 'reference',
+  }
 }

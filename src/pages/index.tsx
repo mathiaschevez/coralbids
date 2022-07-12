@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import React from 'react'
 import { Product } from '../components'
@@ -16,20 +17,14 @@ export type ProductsType = [
     slug: {
       current: string
     }
-    bids: [
-      {
-        id: string,
-        name: string,
-        email: string,
-        image: string,
-        dateTime: Date
-      }
-    ],
     openingDate: Date
   }
 ]
 
 const Home: React.FC<{products: ProductsType}> = ({products}) => {
+  const { data: session, status } = useSession()
+
+  console.log(session)
 
   return (
     <div>

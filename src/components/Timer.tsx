@@ -6,7 +6,7 @@ const minutes = seconds * 60
 const hours = minutes * 60
 const days = hours * 24
 
-const Timer = ({ openingDate, getCurrentBids }: {openingDate: Date, getCurrentBids: () => {}}) => {
+const Timer = ({ openingDate, refreshBids }: {openingDate: Date, refreshBids: () => {}}) => {
   const [now, setNow] = useState(new Date().getTime())
   const [timeUp, setTimeUp] = useState(false)
   
@@ -23,9 +23,8 @@ const Timer = ({ openingDate, getCurrentBids }: {openingDate: Date, getCurrentBi
     const handleTimer = () => {
       
       if(!timeUp) {
-        console.log('here')
         if(secondsLeft % 10 === 0) {
-          getCurrentBids()
+          refreshBids()
         }
         setSecondsLeft(Math.floor((timeLeft % minutes) / seconds))
         setNow(new Date().getTime())
@@ -49,8 +48,8 @@ const Timer = ({ openingDate, getCurrentBids }: {openingDate: Date, getCurrentBi
       start()
     },
     onTimeUpdate: (time) => {
-      if(time % 10 === 0) {
-        getCurrentBids()
+      if(time % 2 === 0) {
+        refreshBids()
       }
       console.log('Time is updated', time);
     },

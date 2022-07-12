@@ -4,63 +4,89 @@ import Link from 'next/link'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useStateContext } from '../../context/StateContext'
 import { client, urlFor } from '../../db/client'
-import { ProductType } from '../../utils/types'
+import { ProductType, BidType } from '../../utils/types'
 import dayjs from 'dayjs'
 import { v4 as uuid } from 'uuid';
 import { Timer } from '../../components'
+import { reverse } from 'dns/promises'
+import { fetchBids } from '../../utils/fetchBids'
 
-
-type Bids = [
-  {
-    id: string,
-    name: string,
-    email: string,
-    image: string,
-    dateTime: Date,
-  }
-]
-
-const ProductDetail: React.FC<{product: ProductType, bids: Bids, openingDate: Date}> = ({ product, bids, openingDate }) => {
+const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ product, openingDate }) => {
   const { data: session, status } = useSession()
   const { darkModeActive } = useStateContext()
   const src = urlFor(product?.image && product?.image[0]).url()
-  const [currentBids, setCurrentBids] = useState(bids)
+  const [currentBids, setCurrentBids] = useState<BidType[]>([])
 
-  console.log(product)
-  console.log(session)
-
-  const getCurrentBids = async () => {
-    const query = `*[_type == "product" && slug.current == '${product.slug.current}'][0]`
-    const currentProduct = await client.fetch(query)
-
-    const newBids = currentProduct?.bids
-    setCurrentBids(newBids)
-    // console.log(currentProduct)
-    // console.log(newBids)
-    // console.log(product.slug.current) 
+  const refreshBids = async () => {
+    const bids: BidType[] = await fetchBids(product._id)
+    setCurrentBids(bids)
   }
+  console.log(currentBids)
 
-  const handleBid = () => {
+  useEffect(() => {
+    refreshBids()
+  }, [])
+
+  // const getCurrentBids = async () => {
+  //   const query = `*[_type == "product" && slug.current == '${product.slug.current}'][0]`
+  //   const currentProduct = await client.fetch(query)
+
+  //   const newBids = currentProduct?.bids
+  //   setCurrentBids(newBids)
+  //   // console.log(currentProduct)
+  //   // console.log(newBids)
+  //   // console.log(product.slug.current) 
+  // }
+
+  // const handleBid = () => {
+  //   if(session) {
+  //     client.patch(product._id)
+  //     .setIfMissing({bids: []})
+  //     .insert('before', 'bids[0]', [{
+  //       id: uuid(),
+  //       name: session.user?.name,
+  //       email: session.user?.email,
+  //       image: session.user?.image,
+  //       dateTime: dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
+  //     }])
+  //     .commit({autoGenerateArrayKeys: true})
+  //     .then(() => {
+  //       console.log('Bid added')
+  //       refreshBids()
+  //     })
+  //     .catch((err) => {
+  //       console.log('Something went wrong', err.message)
+  //     })
+  //   }
+  // }
+
+  const handleBid = async () => {
     if(session) {
-      client.patch(product._id)
-      .setIfMissing({bids: []})
-      .insert('after', 'bids[-1]', [{
-        id: uuid(),
-        name: session.user?.name,
-        email: session.user?.email,
-        image: session.user?.image,
-        dateTime: dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
-      }])
-      .commit({autoGenerateArrayKeys: true})
-      .then(() => {
-        console.log('Bid added')
+      console.log('here')
+      const bid: BidType = {
+        name: session.user?.name || '',
+        email: session.user?.email || '',
+        image: session.user?.image || '',
+        createdAt: new Date(),
+        product: {
+          _ref: product._id,
+          _type: 'reference'
+        }
+      }
+
+      console.log(bid)
+
+      const result = await fetch(`/api/addBid`, {
+        body: JSON.stringify(bid),
+        method: 'POST',
       })
-      .catch((err) => {
-        console.log('Something went wrong', err.message)
-      })
+
+      const json = await result.json()
+      refreshBids()
+
+      return json
     }
   }
-
 
   if (!product) return <h1>This product does not exist...</h1>
 
@@ -92,17 +118,17 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids, openingDate: Da
               <button onClick={() => handleBid()} className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Make a Bid</button>
             )}
           </div>
-          <div className='border rounded pb-6 flex flex-col overflow-y-scroll px-6 no-scroll-bar'>
+          <div className='border rounded pb-6 flex flex-col overflow-y-scroll px-6 no-scroll-bar max-h-[270px]'>
             <h1 className='mt-3 text-lg'>Previous bids</h1>
             <div className='flex flex-col gap-1 mt-3'>
-              {bids?.map((bidder, i) => (
+              {currentBids?.map((bid, i) => (
                 <div key={i} className='flex gap-3 border w-full items-center p-1 rounded'>
                   <div className='flex items-center justify-center z-10'>
-                    <Image loader={() => bidder?.image} src={bidder?.image} alt={bidder?.name} height={30} width={30} className='rounded-full'/>
+                    <Image loader={() => bid?.image} src={bid?.image} alt={bid?.name} height={30} width={30} className='rounded-full'/>
                   </div>
                   <div className='flex justify-between w-full px-3'>
-                    <h1>{bidder?.name}</h1>
-                    <h1>{dayjs(bidder?.dateTime).format('h : mm : ss')}</h1>
+                    <h1>{bid?.name}</h1>
+                    <h1>{dayjs(bid?.createdAt).format('h : mm : ss')}</h1>
                   </div>
                 </div>
               ))}
@@ -111,7 +137,7 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids, openingDate: Da
         </div>
       </div>
       <div>
-        <Timer openingDate={openingDate} getCurrentBids={getCurrentBids}/>
+        <Timer openingDate={openingDate} refreshBids={refreshBids}/>
       </div>
     </div>
   )
@@ -141,12 +167,11 @@ export const getStaticPaths = async () => {
 export const getStaticProps = async ({ params: { slug }}: {params: { slug: string }}) => {
   const query = `*[_type == "product" && slug.current == '${slug}'][0]`
   const product: ProductType = await client.fetch(query)
-  const bids = product?.bids?.reverse() || []
   const openingDate = product?.openingDate
 
 
   return {
-    props: { product, bids, openingDate }
+    props: { product, openingDate },
   }
 }
 

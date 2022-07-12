@@ -42,22 +42,6 @@ export default {
       type: 'string',
     },
     {
-      name: 'bids',
-      title: 'Bids',
-      type: 'array',
-      of: [
-        { type: 'object',
-          fields: [
-            {name: 'id', type: 'string', title: 'ID'},
-            {name: 'name', type: 'string', title: 'Name'},
-            {name: 'email', type: 'string', title: 'Email'},
-            {name: 'image', type: 'string', title: 'Image'},
-            {name: 'dateTime', type: 'datetime', title: 'Date Time'}
-          ]
-        }
-      ],
-    },
-    {
       title: 'Opening Date',
       name: 'openingDate',
       type: 'datetime'
