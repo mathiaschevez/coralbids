@@ -62,7 +62,6 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
 
   const handleBid = async () => {
     if(session) {
-      console.log('here')
       const bid: BidType = {
         name: session.user?.name || '',
         email: session.user?.email || '',
