@@ -51,7 +51,8 @@ export default {
             {name: 'id', type: 'string', title: 'ID'},
             {name: 'name', type: 'string', title: 'Name'},
             {name: 'email', type: 'string', title: 'Email'},
-            {name: 'image', type: 'string', title: 'Image'}
+            {name: 'image', type: 'string', title: 'Image'},
+            {name: 'dateTime', type: 'datetime', title: 'Date Time'}
           ]
         }
       ],
@@ -69,7 +70,8 @@ export default {
         {name: 'id', type: 'string', title: 'ID'},
         {name: 'name', type: 'string', title: 'Name'},
         {name: 'email', type: 'string', title: 'Email'},
-        {name: 'image', type: 'string', title: 'Image'}
+        {name: 'image', type: 'string', title: 'Image'},
+        {name: 'dateTime', type: 'datetime', title: 'Date Time'}
       ]
     }
   ] 

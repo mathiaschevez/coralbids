@@ -5,6 +5,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useStateContext } from '../../context/StateContext'
 import { client, urlFor } from '../../db/client'
 import { ProductType } from '../../utils/types'
+import dayjs from 'dayjs'
+import { v4 as uuid } from 'uuid';
+import { Timer } from '../../components'
+
 
 type Bids = [
   {
@@ -12,7 +16,7 @@ type Bids = [
     name: string,
     email: string,
     image: string,
-    openingDate: Date
+    dateTime: Date,
   }
 ]
 
@@ -22,61 +26,39 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids, openingDate: Da
   const src = urlFor(product?.image && product?.image[0]).url()
   const [currentBids, setCurrentBids] = useState(bids)
 
+  console.log(product)
+  console.log(session)
 
-  // TIMER LOGIC
-  // console.log(openingDate)
-  const [countDate, setCountDate] = useState(new Date(openingDate).getTime())
-  const [now, setNow] = useState(new Date().getTime())
-  const seconds = 1000
-  const minutes = seconds * 60
-  const hours = minutes * 60
-  const days = hours * 24
-  
-  const [secondsLeft, setSecondsLeft] = useState(0)
-  // const [minutesLeft, setMinutesLeft] = useState(0)
-  // const [hoursLeft, setHoursLeft] = useState(0)
-  // const [daysLeft, setDaysLeft] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(0)
-
-  setTimeout(() => setTimeLeft(countDate - now), 1000)
-  // console.log(timeLeft)
-
-  const handleTimer = () => {
-    setSecondsLeft(Math.floor((timeLeft % minutes) / seconds))
-    setNow(new Date().getTime())
-  }
-
-  useEffect(() => {
-    handleTimer()
-    if(secondsLeft % 10 === 0) {
-      getCurrentBids()
-    }
-  }, [timeLeft])
-
-  // useEffect(() => {
-  //   setMinutesLeft(Math.floor(timeLeft % hours / minutes))
-  // }, [secondsLeft])
-
-  const minutesLeft = useMemo(() => Math.floor(timeLeft % hours / minutes), [secondsLeft])
-  const hoursLeft = useMemo(() => Math.floor(timeLeft % days / hours), [minutesLeft])
-  const daysLeft = useMemo(() => Math.floor(timeLeft % days / hours), [hoursLeft])
-
-  // useEffect(() => {
-  //   setHoursLeft(Math.floor(timeLeft % days / hours))
-  // }, [minutesLeft])
-
-  // useEffect(() => {
-  //   setDaysLeft(Math.floor(timeLeft / days))
-  // }, [hoursLeft])
-
-  //move this inside the use effect and other dependencies aswell
   const getCurrentBids = async () => {
-    console.log(currentBids)
-  }
+    const query = `*[_type == "product" && slug.current == '${product.slug.current}'][0]`
+    const currentProduct = await client.fetch(query)
 
+    const newBids = currentProduct?.bids
+    setCurrentBids(newBids)
+    // console.log(currentProduct)
+    // console.log(newBids)
+    // console.log(product.slug.current) 
+  }
 
   const handleBid = () => {
-
+    if(session) {
+      client.patch(product._id)
+      .setIfMissing({bids: []})
+      .insert('after', 'bids[-1]', [{
+        id: uuid(),
+        name: session.user?.name,
+        email: session.user?.email,
+        image: session.user?.image,
+        dateTime: dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
+      }])
+      .commit({autoGenerateArrayKeys: true})
+      .then(() => {
+        console.log('Bid added')
+      })
+      .catch((err) => {
+        console.log('Something went wrong', err.message)
+      })
+    }
   }
 
 
@@ -116,9 +98,12 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids, openingDate: Da
               {bids?.map((bidder, i) => (
                 <div key={i} className='flex gap-3 border w-full items-center p-1 rounded'>
                   <div className='flex items-center justify-center z-10'>
-                    <Image loader={() => bidder?.image} src={bidder?.image} alt={bidder?.name} height={30} width={30}/>
+                    <Image loader={() => bidder?.image} src={bidder?.image} alt={bidder?.name} height={30} width={30} className='rounded-full'/>
                   </div>
-                  <h1>{bidder?.name}</h1>
+                  <div className='flex justify-between w-full px-3'>
+                    <h1>{bidder?.name}</h1>
+                    <h1>{dayjs(bidder?.dateTime).format('h : mm : ss')}</h1>
+                  </div>
                 </div>
               ))}
             </div>
@@ -126,7 +111,7 @@ const ProductDetail: React.FC<{product: ProductType, bids: Bids, openingDate: Da
         </div>
       </div>
       <div>
-        <h1>{daysLeft}: {hoursLeft}: {minutesLeft}: {secondsLeft}</h1>
+        <Timer openingDate={openingDate} getCurrentBids={getCurrentBids}/>
       </div>
     </div>
   )
@@ -156,8 +141,9 @@ export const getStaticPaths = async () => {
 export const getStaticProps = async ({ params: { slug }}: {params: { slug: string }}) => {
   const query = `*[_type == "product" && slug.current == '${slug}'][0]`
   const product: ProductType = await client.fetch(query)
-  const bids = product?.bids
+  const bids = product?.bids?.reverse() || []
   const openingDate = product?.openingDate
+
 
   return {
     props: { product, bids, openingDate }

@@ -21,6 +21,7 @@ export type ProductsType = [
         name: string,
         email: string,
         image: string,
+        dateTime: Date
       }
     ],
     openingDate: Date

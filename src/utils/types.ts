@@ -1,4 +1,5 @@
 export type ProductType = {
+  _id: string,
   image: string,
   name: string,
   price: number,
@@ -13,7 +14,9 @@ export type ProductType = {
       name: string,
       email: string,
       image: string,
+      dateTime: Date,
     }
   ],
   openingDate: Date,
+
 }
