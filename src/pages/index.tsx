@@ -7,6 +7,7 @@ import { client } from '../db/client'
 
 export type ProductsType = [
   {
+    _id: string,
     image: string,
     name: string,
     price: number,
