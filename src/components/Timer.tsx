@@ -47,11 +47,9 @@ const Timer = ({ openingDate, refreshBids }: {openingDate: Date, refreshBids: ()
       console.log('Time is over');
       start()
     },
-    onTimeUpdate: (time) => {
-      if(time % 2 === 0) {
-        refreshBids()
-      }
-      console.log('Time is updated', time);
+    onTimeUpdate: () => {
+      console.log(time)
+      refreshBids()
     },
   })
 
@@ -62,12 +60,22 @@ const Timer = ({ openingDate, refreshBids }: {openingDate: Date, refreshBids: ()
         <button className='border p-2 px-6' onClick={pause}>Pause</button>
         <button className='border p-2 px-6' onClick={reset}>Reset</button>
       </div>
-      <p>Elapsed time: {time}</p>
-      {status === 'RUNNING' && <p>Running...</p>}
-      <div>-----------------------------------------</div>
       <div>
-        {!timeUp && (
-          <h1>{daysLeft} : {hoursLeft} : {minutesLeft} : {secondsLeft}</h1>
+        {!timeUp ? (
+          <div className='flex flex-col'>
+            <div className='flex gap-3'>
+              <h1>{daysLeft} days</h1>
+              <h1>{hoursLeft} hours</h1>
+              <h1>{minutesLeft} minutes</h1>
+              <h1>{secondsLeft} seconds</h1>
+            </div>
+            <h1>until this item becomes available</h1>
+          </div>
+        ) : (
+          <div>
+            <p>Elapsed time: {time}</p>
+            {status === 'RUNNING' && <p>Running...</p>}
+          </div>
         )}
       </div>
     </div>

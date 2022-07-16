@@ -43,8 +43,8 @@ const Navbar = () => {
                 <Link href='/'>
                   <button className='hover:text-black'>Auctions</button>
                 </Link>
-                <Link href='/'> 
-                  <button className='hover:text-black'>Profile</button>
+                <Link href='/my-items'> 
+                  <button className='hover:text-black'>My Items</button>
                 </Link>
               </div>
             </div>

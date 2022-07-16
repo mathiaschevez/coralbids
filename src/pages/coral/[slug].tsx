@@ -14,51 +14,25 @@ import { fetchBids } from '../../utils/fetchBids'
 const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ product, openingDate }) => {
   const { data: session, status } = useSession()
   const { darkModeActive } = useStateContext()
-  const src = urlFor(product?.image && product?.image[0]).url()
   const [currentBids, setCurrentBids] = useState<BidType[]>([])
-
+  const [winningBid, setWinningBid] = useState({})
+  const [totalCost, setTotalCost] = useState(product.price)
+  const src = urlFor(product?.image && product?.image[0]).url()
+  
   const refreshBids = async () => {
     const bids: BidType[] = await fetchBids(product._id)
     setCurrentBids(bids)
+    setWinningBid(bids[0])
+    if(currentBids.length > 0) {
+      setTotalCost(currentBids.length * .10 + product.price)
+    }
   }
   console.log(currentBids)
+  console.log(winningBid)
 
   useEffect(() => {
     refreshBids()
   }, [])
-
-  // const getCurrentBids = async () => {
-  //   const query = `*[_type == "product" && slug.current == '${product.slug.current}'][0]`
-  //   const currentProduct = await client.fetch(query)
-
-  //   const newBids = currentProduct?.bids
-  //   setCurrentBids(newBids)
-  //   // console.log(currentProduct)
-  //   // console.log(newBids)
-  //   // console.log(product.slug.current) 
-  // }
-
-  // const handleBid = () => {
-  //   if(session) {
-  //     client.patch(product._id)
-  //     .setIfMissing({bids: []})
-  //     .insert('before', 'bids[0]', [{
-  //       id: uuid(),
-  //       name: session.user?.name,
-  //       email: session.user?.email,
-  //       image: session.user?.image,
-  //       dateTime: dayjs(new Date().getTime()).format('YYYY-MM-DD HH:mm:ss')
-  //     }])
-  //     .commit({autoGenerateArrayKeys: true})
-  //     .then(() => {
-  //       console.log('Bid added')
-  //       refreshBids()
-  //     })
-  //     .catch((err) => {
-  //       console.log('Something went wrong', err.message)
-  //     })
-  //   }
-  // }
 
   const handleBid = async () => {
     if(session) {
@@ -73,14 +47,13 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
         }
       }
 
-      console.log(bid)
-
       const result = await fetch(`/api/addBid`, {
         body: JSON.stringify(bid),
         method: 'POST',
       })
 
       const json = await result.json()
+      
       refreshBids()
 
       return json
@@ -90,7 +63,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
   if (!product) return <h1>This product does not exist...</h1>
 
   return (
-    <div className='text-white pb-[500px]'>
+    <div className='text-white'>
       <div className={`${ darkModeActive ? 'text-white' : 'text-black'} flex flex-col lg:flex-row gap-6`}>
         <div className='m-auto'>
           <Image 
@@ -111,7 +84,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
           <div className='flex flex-col justify-between items-center lg:flex-row gap-3 lg:items-start w-full'>
             <div className='flex gap-6 justify-between w-full items-center'>
               <h1 className='text-xl z-30 py-3'>The current bid is at: </h1>
-              <h1 className='px-6 py-3 border text-xl rounded text-coralblue'>${product?.price}.00</h1>
+              <h1 className='px-6 py-3 border text-xl rounded text-coralblue'>${`${currentBids[0] ? totalCost : 1}`}</h1>
             </div>
             { session && status === 'authenticated' && (
               <button onClick={() => handleBid()} className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Make a Bid</button>
