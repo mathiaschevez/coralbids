@@ -91,6 +91,9 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
             { session && status === 'authenticated' && winningBid?.email !== session.user?.email && timeUp && !bidCompleted && (
               <button onClick={() => handleBid()} className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Make a Bid</button>
             )}
+            {bidCompleted && session?.user?.email === winningBid?.email && (
+              <button className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Purchase</button>
+            )}
           </div>
           <div className='border rounded pb-6 flex flex-col overflow-y-scroll px-6 no-scroll-bar max-h-[270px]'>
             <h1 className='mt-3 text-lg'>Previous bids</h1>

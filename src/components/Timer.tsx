@@ -72,7 +72,7 @@ const Timer = ({ product, winningBid, openingDate, refreshBids, newBid, setNewBi
   })
 
   const handleCompleteBidding = async () => {
-    const result = await fetch(`/api/editBid`, {
+    const result = await fetch(`/api/editProduct`, {
       body: JSON.stringify(winningBid),
       method: 'POST',
     })
