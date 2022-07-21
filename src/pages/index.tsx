@@ -5,26 +5,9 @@ import Image from 'next/image'
 import React from 'react'
 import { Product } from '../components'
 import { client } from '../db/client'
+import { ProductType } from '../utils/types'
 
-export type ProductsType = [
-  {
-    _id: string,
-    image: string,
-    name: string,
-    price: number,
-    key: string,
-    details: string,
-    slug: {
-      current: string
-    }
-    openingDate: Date
-  }
-]
-
-const Home: React.FC<{products: ProductsType}> = ({products}) => {
-  const { data: session, status } = useSession()
-
-  console.log(session)
+const Home: React.FC<{products: ProductType[]}> = ({products}) => {
 
   return (
     <div className='pb-[500px]'>

@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTimer } from 'use-timer';
-import { BidType } from '../utils/types';
+import { client } from '../db/client';
+import { BidType, ProductType } from '../utils/types';
 
 const seconds = 1000
 const minutes = seconds * 60
 const hours = minutes * 60
 const days = hours * 24
 
-const Timer = ({ winningBid, openingDate, refreshBids, newBid, setNewBid, timeUp, setTimeUp, bidCompleted }: 
-  {openingDate: Date, refreshBids: () => {}, newBid: boolean, setNewBid: (value: boolean) => void, timeUp: boolean, setTimeUp: (value: boolean) => void, bidCompleted: boolean, winningBid: BidType}) => {
+const Timer = ({ product, winningBid, openingDate, refreshBids, newBid, setNewBid, timeUp, setTimeUp, bidCompleted, setBidCompleted }: 
+  {product: ProductType, openingDate: Date, refreshBids: () => {}, newBid: boolean, setNewBid: (value: boolean) => void, timeUp: boolean, setTimeUp: (value: boolean) => void, bidCompleted: boolean, winningBid: BidType, setBidCompleted: (value: boolean) => void}) => {
   const [now, setNow] = useState(new Date().getTime())
   const [newOpeningDate, setOpeningDate] = useState(new Date(openingDate).getTime())
   
@@ -42,7 +43,7 @@ const Timer = ({ winningBid, openingDate, refreshBids, newBid, setNewBid, timeUp
 
   const { time, start, pause, reset, status } = useTimer({
     initialTime: 5,
-    endTime: -1,
+    endTime: 0,
     timerType: 'DECREMENTAL',
     onTimeOver: () => {
       console.log('Time is over');
@@ -50,16 +51,20 @@ const Timer = ({ winningBid, openingDate, refreshBids, newBid, setNewBid, timeUp
         start()
         setNewBid(false)
       } else {
-        reset()
         stop()
         if(!bidCompleted) {
-          console.log('here')
           handleCompleteBidding()
+          if(!winningBid) {
+            client.patch(product._id)
+            .set({ bidCompleted: true })
+            .commit()
+            .then(() => console.log('Bid completed'))
+            .catch(err => console.log(err))
+          }
         }
       }
     },
     onTimeUpdate: () => {
-      // console.log(time)
       if(time >= 0) {
         refreshBids()
       }
@@ -72,13 +77,14 @@ const Timer = ({ winningBid, openingDate, refreshBids, newBid, setNewBid, timeUp
       method: 'POST',
     })
 
-    console.log(result)
-
     const json = await result.json()
-    console.log(json)
   }
 
-  if(bidCompleted) return <h1>Bid is completed</h1>
+  if(bidCompleted && winningBid) {
+    return <h1>Bidding is completed</h1>
+  } else if (bidCompleted && !winningBid) {
+    return <h1>Time to submit a bid has ran out</h1>
+  }
   
   return (
     <div className='mt-6'>

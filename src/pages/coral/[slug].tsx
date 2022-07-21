@@ -17,6 +17,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
   const [totalCost, setTotalCost] = useState(product.price)
   const [timeUp, setTimeUp] = useState(false)
   const [newBid, setNewBid] = useState(false)
+  const [bidCompleted, setBidCompleted] = useState(product.bidCompleted)
 
   const src = urlFor(product?.image && product?.image[0]).url()
 
@@ -87,7 +88,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
               <h1 className='text-xl z-30 py-3'>The current bid is at: </h1>
               <h1 className='px-6 py-3 border text-xl rounded text-coralblue'>${`${currentBids[0] ? totalCost : 1}`}</h1>
             </div>
-            { session && status === 'authenticated' && winningBid?.email !== session.user?.email && timeUp && (
+            { session && status === 'authenticated' && winningBid?.email !== session.user?.email && timeUp && !bidCompleted && (
               <button onClick={() => handleBid()} className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Make a Bid</button>
             )}
           </div>
@@ -110,7 +111,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
         </div>
       </div>
       <div>
-        <Timer winningBid={winningBid} openingDate={openingDate} refreshBids={refreshBids} newBid={newBid} setNewBid={setNewBid} timeUp={timeUp} setTimeUp={setTimeUp} bidCompleted={product.bidCompleted}/>
+        <Timer winningBid={winningBid} openingDate={openingDate} refreshBids={refreshBids} newBid={newBid} setNewBid={setNewBid} timeUp={timeUp} setTimeUp={setTimeUp} bidCompleted={bidCompleted} setBidCompleted={setBidCompleted} product={product}/>
       </div>
     </div>
   )

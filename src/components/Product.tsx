@@ -7,7 +7,6 @@ import { ProductType } from '../utils/types'
 
 const Product = ({ product }: { product: ProductType }) => {
   const { darkModeActive } = useStateContext()
-  console.log(product)
   const src = urlFor(product.image && product?.image[0]).url()
 
   return (
