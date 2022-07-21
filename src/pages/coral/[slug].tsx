@@ -1,24 +1,25 @@
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
-import Link from 'next/link'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useStateContext } from '../../context/StateContext'
 import { client, urlFor } from '../../db/client'
 import { ProductType, BidType } from '../../utils/types'
 import dayjs from 'dayjs'
-import { v4 as uuid } from 'uuid';
 import { Timer } from '../../components'
-import { reverse } from 'dns/promises'
 import { fetchBids } from '../../utils/fetchBids'
+import { v4 as uuid } from 'uuid';
 
 const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ product, openingDate }) => {
   const { data: session, status } = useSession()
   const { darkModeActive } = useStateContext()
   const [currentBids, setCurrentBids] = useState<BidType[]>([])
-  const [winningBid, setWinningBid] = useState({})
+  const [winningBid, setWinningBid] = useState({} as BidType)
   const [totalCost, setTotalCost] = useState(product.price)
+  const [timeUp, setTimeUp] = useState(false)
+  const [newBid, setNewBid] = useState(false)
+
   const src = urlFor(product?.image && product?.image[0]).url()
-  
+
   const refreshBids = async () => {
     const bids: BidType[] = await fetchBids(product._id)
     setCurrentBids(bids)
@@ -27,8 +28,6 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
       setTotalCost(currentBids.length * .10 + product.price)
     }
   }
-  console.log(currentBids)
-  console.log(winningBid)
 
   useEffect(() => {
     refreshBids()
@@ -37,6 +36,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
   const handleBid = async () => {
     if(session) {
       const bid: BidType = {
+        id: uuid(),
         name: session.user?.name || '',
         email: session.user?.email || '',
         image: session.user?.image || '',
@@ -56,6 +56,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
       
       refreshBids()
 
+      setNewBid(true)
       return json
     }
   }
@@ -86,7 +87,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
               <h1 className='text-xl z-30 py-3'>The current bid is at: </h1>
               <h1 className='px-6 py-3 border text-xl rounded text-coralblue'>${`${currentBids[0] ? totalCost : 1}`}</h1>
             </div>
-            { session && status === 'authenticated' && (
+            { session && status === 'authenticated' && winningBid?.email !== session.user?.email && timeUp && (
               <button onClick={() => handleBid()} className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Make a Bid</button>
             )}
           </div>
@@ -109,7 +110,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
         </div>
       </div>
       <div>
-        <Timer openingDate={openingDate} refreshBids={refreshBids}/>
+        <Timer winningBid={winningBid} openingDate={openingDate} refreshBids={refreshBids} newBid={newBid} setNewBid={setNewBid} timeUp={timeUp} setTimeUp={setTimeUp} bidCompleted={product.bidCompleted}/>
       </div>
     </div>
   )

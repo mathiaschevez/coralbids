@@ -15,16 +15,17 @@ export default async function handler(
   const mutations = {
     mutations: [
       {
-        create: {
-          _type: 'bid',
-          id: bid.id,
-          name: bid.name,
-          email: bid.email,
-          image: bid.image,
-          createdAt: bid.createdAt,
-          product: {
-            _type: 'reference',
-            _ref: bid.product._ref,
+        patch: {
+          id: bid.product._ref,
+          set: {
+            winningBid: {
+              id: bid.id,
+              name: bid.name,
+              email: bid.email,
+              image: bid.image,
+              dateTime: bid.createdAt,
+            },
+            bidCompleted: true,
           }
         }
       }
@@ -43,5 +44,5 @@ export default async function handler(
 
   const json = await result.json()
 
-  res.status(200).json({ message: 'Added bid'})
+  res.status(200).json({ message: 'Completed bidding.'})
 }

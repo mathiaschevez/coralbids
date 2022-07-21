@@ -5,7 +5,7 @@ import { client } from '../../db/client'
 import { BidType } from '../../utils/types'
 
 const bidQuery = groq`
-  *[_type == "bid" && references(*[_type== 'product' && _id == 'ff738c1d-79a5-4823-b100-71a9093459c2']._id)] {
+  *[_type == "bid" && references(*[_type== 'product' && _id == $productId]._id)] {
     _id,
     ...
   } | order(_createdAt desc)

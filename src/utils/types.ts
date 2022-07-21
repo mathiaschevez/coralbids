@@ -9,9 +9,18 @@ export type ProductType = {
     current: string
   },
   openingDate: Date,
+  winningBid: {
+    id: string,
+    name: string,
+    email: string,
+    image: string,
+    dateTime: Date,
+  }
+  bidCompleted: boolean,
 }
 
 export type BidType = {
+  id: string,
   name: string,
   email: string,
   image: string,

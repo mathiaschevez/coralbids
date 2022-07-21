@@ -1,14 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTimer } from 'use-timer';
+import { BidType } from '../utils/types';
 
 const seconds = 1000
 const minutes = seconds * 60
 const hours = minutes * 60
 const days = hours * 24
 
-const Timer = ({ openingDate, refreshBids }: {openingDate: Date, refreshBids: () => {}}) => {
+const Timer = ({ winningBid, openingDate, refreshBids, newBid, setNewBid, timeUp, setTimeUp, bidCompleted }: 
+  {openingDate: Date, refreshBids: () => {}, newBid: boolean, setNewBid: (value: boolean) => void, timeUp: boolean, setTimeUp: (value: boolean) => void, bidCompleted: boolean, winningBid: BidType}) => {
   const [now, setNow] = useState(new Date().getTime())
-  const [timeUp, setTimeUp] = useState(false)
+  const [newOpeningDate, setOpeningDate] = useState(new Date(openingDate).getTime())
   
   const [secondsLeft, setSecondsLeft] = useState(0)
   const [timeLeft, setTimeLeft] = useState(1)
@@ -17,15 +19,12 @@ const Timer = ({ openingDate, refreshBids }: {openingDate: Date, refreshBids: ()
   const hoursLeft = useMemo(() => Math.floor(timeLeft % days / hours), [minutesLeft])
   const daysLeft = useMemo(() => Math.floor(timeLeft / days), [hoursLeft])
 
-  setTimeout(() => setTimeLeft(new Date(openingDate).getTime() - now), 1000)
+  setTimeout(() => setTimeLeft(newOpeningDate - now), 1000)
 
   useEffect(() => {
     const handleTimer = () => {
-      
       if(!timeUp) {
-        if(secondsLeft % 10 === 0) {
-          refreshBids()
-        }
+        refreshBids()
         setSecondsLeft(Math.floor((timeLeft % minutes) / seconds))
         setNow(new Date().getTime())
       }
@@ -33,51 +32,77 @@ const Timer = ({ openingDate, refreshBids }: {openingDate: Date, refreshBids: ()
     
     if(timeLeft <= 0) {
       setTimeUp(true)
-      start()
+      if(!bidCompleted) {
+        start()
+      }
     }
 
     handleTimer()
   }, [timeLeft])
 
   const { time, start, pause, reset, status } = useTimer({
-    initialTime: 30,
+    initialTime: 5,
     endTime: -1,
     timerType: 'DECREMENTAL',
     onTimeOver: () => {
       console.log('Time is over');
-      start()
+      if(newBid) {
+        start()
+        setNewBid(false)
+      } else {
+        reset()
+        stop()
+        if(!bidCompleted) {
+          console.log('here')
+          handleCompleteBidding()
+        }
+      }
     },
     onTimeUpdate: () => {
-      console.log(time)
-      refreshBids()
+      // console.log(time)
+      if(time >= 0) {
+        refreshBids()
+      }
     },
   })
 
+  const handleCompleteBidding = async () => {
+    const result = await fetch(`/api/editBid`, {
+      body: JSON.stringify(winningBid),
+      method: 'POST',
+    })
+
+    console.log(result)
+
+    const json = await result.json()
+    console.log(json)
+  }
+
+  if(bidCompleted) return <h1>Bid is completed</h1>
+  
   return (
     <div className='mt-6'>
-      <div className='flex gap-3'>
-        <button className='border p-2 px-6' onClick={start}>Start</button>
-        <button className='border p-2 px-6' onClick={pause}>Pause</button>
-        <button className='border p-2 px-6' onClick={reset}>Reset</button>
-      </div>
-      <div>
-        {!timeUp ? (
-          <div className='flex flex-col'>
-            <div className='flex gap-3'>
-              <h1>{daysLeft} days</h1>
-              <h1>{hoursLeft} hours</h1>
-              <h1>{minutesLeft} minutes</h1>
-              <h1>{secondsLeft} seconds</h1>
-            </div>
-            <h1>until this item becomes available</h1>
+      {!timeUp ? (
+        <div className='flex flex-col'>
+          <div className='flex gap-3'>
+            <h1><span className='text-xl text-coralblue'>{daysLeft}</span> days </h1>
+            <h1><span className='text-xl text-coralblue'>{hoursLeft}</span> hours </h1>
+            <h1><span className='text-xl text-coralblue'>{minutesLeft}</span> minutes </h1>
+            <h1><span className='text-xl text-coralblue'>{secondsLeft}</span> seconds </h1>
           </div>
-        ) : (
-          <div>
-            <p>Elapsed time: {time}</p>
-            {status === 'RUNNING' && <p>Running...</p>}
+          <h1 className='text-xl'>until bidding for this item opens</h1>
+        </div>
+      ) : (
+        <div>
+          <div className='flex gap-3'>
+            <button className='border p-2 px-6' onClick={start}>Start</button>
+            <button className='border p-2 px-6' onClick={pause}>Pause</button>
+            <button className='border p-2 px-6' onClick={reset}>Reset</button>
           </div>
-        )}
-      </div>
+          <p>Time remaining to make a bid: {time}</p>
+          {status === 'RUNNING' && <p>Running...</p>}
+        </div>
+      )}
     </div>
   )
 }

@@ -57,6 +57,11 @@ export default {
         {name: 'image', type: 'string', title: 'Image'},
         {name: 'dateTime', type: 'datetime', title: 'Date Time'}
       ]
+    },
+    {
+      name: 'bidCompleted',
+      title: 'Bid Completed',
+      type: 'boolean',
     }
   ] 
 }
