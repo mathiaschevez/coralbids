@@ -105,7 +105,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
                   </div>
                   <div className='flex justify-between w-full px-3'>
                     <h1>{bid?.name}</h1>
-                    <h1>{dayjs(bid?.createdAt).format('h : mm : ss')}</h1>
+                    <h1>{dayjs(bid?.createdAt).format('MMM DD - hh : mm : ss')}</h1>
                   </div>
                 </div>
               ))}

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useTimer } from 'use-timer';
+import { useStateContext } from '../context/StateContext';
 import { client } from '../db/client';
 import { BidType, ProductType } from '../utils/types';
 
@@ -10,6 +11,7 @@ const days = hours * 24
 
 const Timer = ({ product, winningBid, openingDate, refreshBids, newBid, setNewBid, timeUp, setTimeUp, bidCompleted, setBidCompleted }: 
   {product: ProductType, openingDate: Date, refreshBids: () => {}, newBid: boolean, setNewBid: (value: boolean) => void, timeUp: boolean, setTimeUp: (value: boolean) => void, bidCompleted: boolean, winningBid: BidType, setBidCompleted: (value: boolean) => void}) => {
+  const { darkModeActive } = useStateContext()
   const [now, setNow] = useState(new Date().getTime())
   const [newOpeningDate, setOpeningDate] = useState(new Date(openingDate).getTime())
   
@@ -42,7 +44,7 @@ const Timer = ({ product, winningBid, openingDate, refreshBids, newBid, setNewBi
   }, [timeLeft])
 
   const { time, start, pause, reset, status } = useTimer({
-    initialTime: 5,
+    initialTime: 30,
     endTime: 0,
     timerType: 'DECREMENTAL',
     onTimeOver: () => {
@@ -81,13 +83,13 @@ const Timer = ({ product, winningBid, openingDate, refreshBids, newBid, setNewBi
   }
 
   if(bidCompleted && winningBid) {
-    return <h1>Bidding is completed</h1>
+    return <h1 className={`${darkModeActive ? 'text-white' : 'text-black'}`}>Bidding is completed</h1>
   } else if (bidCompleted && !winningBid) {
-    return <h1>Time to submit a bid has ran out</h1>
+    return <h1 className={`${darkModeActive ? 'text-white' : 'text-black'}`}>Time to submit a bid has ran out</h1>
   }
   
   return (
-    <div className='mt-6'>
+    <div className={`${darkModeActive ? 'text-white' : 'text-black'} mt-6`}>
       {!timeUp ? (
         <div className='flex flex-col'>
           <div className='flex gap-3'>

@@ -11,6 +11,7 @@
   "dependencies": {
     "@sanity/client": "^3.3.2",
     "@sanity/image-url": "^1.0.1",
+    "@stripe/stripe-js": "^1.32.0",
     "@trpc/client": "^9.25.3",
     "@trpc/next": "^9.25.3",
     "@trpc/react": "^9.25.3",
@@ -23,6 +24,7 @@
     "react-dom": "18.2.0",
     "react-icons": "^4.4.0",
     "react-query": "^3.39.1",
+    "stripe": "^9.14.0",
     "use-timer": "^2.0.1",
     "uuidv4": "^6.2.13",
     "zod": "^3.17.3"
