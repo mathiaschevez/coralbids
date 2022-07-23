@@ -113,7 +113,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
           </div>
         </div>
       </div>
-      <div>
+      <div className='mt-12'>
         <Timer winningBid={winningBid} openingDate={openingDate} refreshBids={refreshBids} newBid={newBid} setNewBid={setNewBid} timeUp={timeUp} setTimeUp={setTimeUp} bidCompleted={bidCompleted} setBidCompleted={setBidCompleted} product={product}/>
       </div>
     </div>

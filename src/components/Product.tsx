@@ -11,7 +11,7 @@ const Product = ({ product }: { product: ProductType }) => {
 
   return (
     <Link href={`/coral/${product.slug.current}`}>
-      <div className={`${darkModeActive ? 'text-white' : 'text-black'} flex flex-col m-auto cursor-pointer`}>
+      <div className={`${darkModeActive ? 'text-white' : 'text-black'} flex flex-col m-auto cursor-pointer items-center`}>
         <Image 
           loader={() => src}
           src={src} 
@@ -19,6 +19,7 @@ const Product = ({ product }: { product: ProductType }) => {
           height={200}
           width={200}
           className='rounded'
+          objectFit='contain'
         />
         <h1>{product.name}</h1>
       </div>

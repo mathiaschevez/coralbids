@@ -40,12 +40,14 @@ const Navbar = () => {
                 </button>
               </Link>
               <div className='flex justify-between gap-9'>
-                <Link href='/'>
+                {/* <Link href='/'>
                   <button className='hover:text-black'>Auctions</button>
-                </Link>
-                <Link href='/my-items'> 
-                  <button className='hover:text-black'>My Items</button>
-                </Link>
+                </Link> */}
+                { session && (
+                  <Link href='/my-items'> 
+                    <button className='hover:text-black'>My Items</button>
+                  </Link>
+                )}
               </div>
             </div>
             {session ? (

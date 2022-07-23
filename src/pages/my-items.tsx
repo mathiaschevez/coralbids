@@ -1,23 +1,31 @@
 import { useSession } from 'next-auth/react'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Product } from '../components'
+import { useStateContext } from '../context/StateContext'
 import { client } from '../db/client'
 import { ProductType } from '../utils/types'
 
 const MyItems = ({ products }: { products: ProductType[] }) => {
   const [userProducts, setUserProducts] = useState([] as ProductType[])
   const { data: session, status } = useSession()
+  const { darkModeActive } = useStateContext()
 
   useEffect(() => {
-    const userProducts = products.filter((product) => {
-      return product?.winningBid?.email === session?.user?.email
-    })
-
-    setUserProducts(userProducts)
+    if(session) {
+      const userProducts = products.filter((product) => {
+        console.log(product)
+        console.log(session)
+        return product?.winningBid?.email === session?.user?.email
+      })
+      setUserProducts(userProducts)
+    }
+    
   }, [products, session])
 
   console.log(products)
   console.log(userProducts)
+
+  if (!session) return <h1 className={`${darkModeActive ? 'text-white' : 'text-coralBlack'} `}>Login to see your items</h1>
   
   return (
     <div className='text-white'>

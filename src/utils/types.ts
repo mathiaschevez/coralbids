@@ -1,6 +1,6 @@
 export type ProductType = {
   _id: string,
-  image: string,
+  image: ProductImageArray,
   name: string,
   price: number,
   key: string,
@@ -18,6 +18,14 @@ export type ProductType = {
   }
   bidCompleted: boolean,
 }
+
+type ProductImageArray = [
+  {
+    asset: {
+      _ref: string,
+    }
+  }
+]
 
 export type BidType = {
   id: string,
