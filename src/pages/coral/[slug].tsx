@@ -8,6 +8,8 @@ import dayjs from 'dayjs'
 import { Timer } from '../../components'
 import { fetchBids } from '../../utils/fetchBids'
 import { v4 as uuid } from 'uuid';
+import getStripe from '../../utils/getStripe'
+import toast from 'react-hot-toast'
 
 const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ product, openingDate }) => {
   const { data: session, status } = useSession()
@@ -20,6 +22,31 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
   const [bidCompleted, setBidCompleted] = useState(product.bidCompleted)
 
   const src = urlFor(product?.image && product?.image[0]).url()
+
+  const [cartItems, setCartItems] = useState([] as ProductType[])
+
+  const handleCheckout = async () => {
+    setCartItems((prevCartItems) => [...prevCartItems, product])
+    const stripe = await getStripe()
+    console.log(stripe)
+
+    const response = await fetch('/api/stripe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(product),
+    })
+
+    // if(response.statusCode === 500) return
+    
+    const data = await response.json()
+    console.log(data)
+
+    toast.loading('Redirecting...')
+
+    stripe.redirectToCheckout({ sessionId: data.id })
+  }
 
   const refreshBids = async () => {
     const bids: BidType[] = await fetchBids(product._id)
@@ -92,7 +119,7 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
               <button onClick={() => handleBid()} className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Make a Bid</button>
             )}
             {bidCompleted && session?.user?.email === winningBid?.email && (
-              <button className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Purchase</button>
+              <button onClick={() => handleCheckout()} className='bg-coralblue py-3 px-16 rounded text-xl hover:bg-coralgreen w-full lg:w-1/2 text-white'>Purchase</button>
             )}
           </div>
           <div className='border rounded pb-6 flex flex-col overflow-y-scroll px-6 no-scroll-bar max-h-[270px]'>

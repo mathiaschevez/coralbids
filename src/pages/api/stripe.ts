@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ProductType } from '../../utils/types';
+import { urlFor } from '../../db/client';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {} as any)
 
@@ -13,31 +14,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         payment_method_types: ['card'],
         billing_address_collection: 'auto',
         shipping_options: [
-          { shipping_rate: 'shr_1KsH2eLcdIwUBbBsXJiilDw5' },
-          { shipping_rate: 'shr_1KsH2sLcdIwUBbBsUtBhpAw7' },
+          { shipping_rate: 'shr_1LOZLEEGFCR7FcBWry7xucjQ' },
         ],
-        line_items: req.body.map((product: ProductType) => {
-          const img = product.image[0].asset._ref;
-          const newImage = img.replace('image-', 'https://cdn.sanity.io/images/xw2cyrcc/production/').replace('-jpg', '.jpg');
-
-          return {
-            price_data: { 
+        line_items: [
+          {
+            price_data: {
               currency: 'usd',
-              product_data: { 
-                name: product.name,
-                images: [newImage],
+              product_data: {
+                name: req.body.name,
+                images: [urlFor(req.body.image[0]).toString()],
               },
-              unit_amount: product.price * 100,
+              unit_amount: req.body.price * 100,
             },
-            adjustable_quantity: {
-              enabled: false,
-              minimum: 1,
-            },
-            quantity: 1,
+            quantity: 1, 
           }
-        }),
+        ],
         success_url: `${req.headers.origin}/success`,
-        cancel_url: `${req.headers.origin}/`,
+        cancel_url: `${req.headers.origin}/coral/${req.body.slug.current}`,
       }
 
       // Create Checkout Sessions from body params.
