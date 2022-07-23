@@ -1,6 +1,5 @@
 import Stripe from 'stripe';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { ProductType } from '../../utils/types';
 import { urlFor } from '../../db/client';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {} as any)
@@ -24,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 name: req.body.name,
                 images: [urlFor(req.body.image[0]).toString()],
               },
-              unit_amount: req.body.price * 100,
+              unit_amount: req.body.price,
             },
             quantity: 1, 
           }

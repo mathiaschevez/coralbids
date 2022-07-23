@@ -1,6 +1,6 @@
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useStateContext } from '../../context/StateContext'
 import { client, urlFor } from '../../db/client'
 import { ProductType, BidType } from '../../utils/types'
@@ -23,25 +23,24 @@ const ProductDetail: React.FC<{product: ProductType, openingDate: Date}> = ({ pr
 
   const src = urlFor(product?.image && product?.image[0]).url()
 
-  const [cartItems, setCartItems] = useState([] as ProductType[])
-
   const handleCheckout = async () => {
-    setCartItems((prevCartItems) => [...prevCartItems, product])
+    const productToSend = {
+      ...product,
+      price: (product.price * 100) + (currentBids.length * 10)
+    }
     const stripe = await getStripe()
-    console.log(stripe)
 
     const response = await fetch('/api/stripe', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(product),
+      body: JSON.stringify(productToSend),
     })
 
     // if(response.statusCode === 500) return
     
     const data = await response.json()
-    console.log(data)
 
     toast.loading('Redirecting...')
 
